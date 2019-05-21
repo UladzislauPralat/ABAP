@@ -1,0 +1,21 @@
+@AbapCatalog.sqlViewName: 'ZMAT'
+@VDM.viewType: #BASIC
+@EndUserText.label: 'Material'
+define view ZI_Material as select from ZI_ProductHierarchyNodeHier 
+{
+  key cast(ProductHierarchyNodeChild as abap.char(40)) as nodeid, 
+  key cast(ProductHierarchyNodeParent as prodh_d) as parentid,
+  cast(ProductHierarchyNodeChild as prodh_d) as prodh,
+  cast('' as matnr) as material 
+}
+
+union
+
+select from ZI_ProductHierarchyNodeHier as prodh join mara 
+                                                  on prodh.ProductHierarchyNodeChild = mara.prdha   
+{
+  key cast(mara.matnr as abap.char(40) ) as nodeid, 
+  key cast(prodh.ProductHierarchyNodeChild as prodh_d) as parentid,
+  cast('' as prodh_d) as prodh,
+  mara.matnr as material
+}
