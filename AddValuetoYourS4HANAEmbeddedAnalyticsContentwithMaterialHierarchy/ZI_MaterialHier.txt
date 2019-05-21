@@ -4,11 +4,11 @@
 @VDM.viewType: #BASIC
 @ObjectModel.dataCategory: #HIERARCHY
 @Hierarchy.parentChild: [{
-rootNode.visibility:#ADD_ROOT_NODE,
-name : 'MAT_HIER',
-label: 'Material Hierarchy',
-siblingsOrder: [{ by: 'material', direction: #ASC }],
-recurseBy: '_parent'  
+  rootNode.visibility:#ADD_ROOT_NODE,
+  name : 'MAT_HIER',
+  label: 'Material Hierarchy',
+  siblingsOrder: [{ by: 'material', direction: #ASC }],
+  recurseBy: '_parent'  
  }]
 define view ZI_MaterialHier as select from ZI_Material
 association[0..1] to ZI_MaterialHier as _parent on $projection.parentid = _parent.nodeid
