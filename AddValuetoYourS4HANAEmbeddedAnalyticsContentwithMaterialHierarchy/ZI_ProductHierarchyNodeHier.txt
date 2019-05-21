@@ -1,0 +1,66 @@
+@AbapCatalog.sqlViewName: 'ZIPRODHNDH'
+@Analytics.dataCategory: #HIERARCHY
+@ObjectModel.representativeKey: 'ProductHierarchyChild'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Product Hierarchy'
+@Hierarchy.parentChild.rootNode.visibility:#ADD_ROOT_NODE
+//@Hierarchy.parentChild.orphanedNode.handling: #ERROR
+@Hierarchy.parentChild.name: 'PROD_HIER'
+@Hierarchy.parentChild.label: 'Product Hierarchy'
+@Hierarchy.parentChild: { recurse:          {
+                          parent: 'ProductHierarchyNodeParent',   child: 'ProductHierarchyNodeChild'   } }
+define view ZI_ProductHierarchyNodeHier as select distinct from z_t179 as t179_child inner join z_t179 as t179_parent
+                                                                                             on t179_child.prodh3 = t179_parent.prodh3
+                                                                                            and t179_child.stufe = '4'
+                                                                                            and t179_parent.stufe = '3'   
+association [0..1] to I_ProductHierarchyNode as _ProductHierarchyNode on $projection.ProductHierarchyNodeChild = _ProductHierarchyNode.ProductHierarchyNode
+{
+  @ObjectModel.foreignKey.association: '_ProductHierarchyNode'
+  key t179_child.prodh as ProductHierarchyNodeChild,
+  t179_parent.prodh as ProductHierarchyNodeParent,
+  t179_child.stufe,
+  _ProductHierarchyNode
+}
+
+union
+
+select distinct from z_t179 as t179_child inner join z_t179 as t179_parent
+                                                  on t179_child.prodh2 = t179_parent.prodh2
+                                                 and t179_child.stufe = '3'
+                                                 and t179_parent.stufe = '2'
+association [0..1] to I_ProductHierarchyNode as _ProductHierarchyNode on $projection.ProductHierarchyNodeChild = _ProductHierarchyNode.ProductHierarchyNode                                                                                        
+{
+  @ObjectModel.foreignKey.association: '_ProductHierarchyNode'
+  key t179_child.prodh as ProductHierarchyNodeChild,
+  t179_parent.prodh as ProductHierarchyNodeParent,
+  t179_child.stufe,
+  _ProductHierarchyNode
+}                                                                                        
+
+union
+
+select distinct from z_t179 as t179_child inner join z_t179 as t179_parent
+                                                  on t179_child.prodh1 = t179_parent.prodh1
+                                                 and t179_child.stufe = '2'
+                                                 and t179_parent.stufe = '1'
+association [0..1] to I_ProductHierarchyNode as _ProductHierarchyNode on $projection.ProductHierarchyNodeChild = _ProductHierarchyNode.ProductHierarchyNode                                                                                        
+{
+  @ObjectModel.foreignKey.association: '_ProductHierarchyNode'
+  key t179_child.prodh as ProductHierarchyNodeChild,
+  t179_parent.prodh as ProductHierarchyNodeParent,
+  t179_child.stufe,
+  _ProductHierarchyNode
+}
+
+
+union
+
+select distinct from z_t179 as t179
+association [0..1] to I_ProductHierarchyNode as _ProductHierarchyNode on $projection.ProductHierarchyNodeChild = _ProductHierarchyNode.ProductHierarchyNode                                                                                        
+{
+  @ObjectModel.foreignKey.association: '_ProductHierarchyNode'
+  key t179.prodh as ProductHierarchyNodeChild,
+  cast('' as prodh_d) as ProductHierarchyNodeParent,
+  t179.stufe,
+  _ProductHierarchyNode
+} where stufe = '1'
