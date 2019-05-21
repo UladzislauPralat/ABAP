@@ -8,4 +8,4 @@ define view z_t179 as select from t179 {
   left(prodh,8) as prodh3,
   left(prodh,13) as prodh4,
   stufe
-} 
+}
