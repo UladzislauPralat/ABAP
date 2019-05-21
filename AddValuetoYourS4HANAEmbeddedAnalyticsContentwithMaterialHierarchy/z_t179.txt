@@ -1,0 +1,11 @@
+@AbapCatalog.sqlViewName: 'ZT179'
+@VDM.viewType: #BASIC
+@EndUserText.label: 'Product Hierarchy'
+define view z_t179 as select from t179 {
+  key prodh, 
+  left(prodh,2) as prodh1,  
+  left(prodh,5) as prodh2,
+  left(prodh,8) as prodh3,
+  left(prodh,13) as prodh4,
+  stufe
+}
