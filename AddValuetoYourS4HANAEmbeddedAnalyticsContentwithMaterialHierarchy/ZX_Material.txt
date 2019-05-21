@@ -1,0 +1,24 @@
+@VDM.viewExtension: true
+@AbapCatalog.sqlViewAppendName: 'ZXMATERIAL'
+@EndUserText.label: 'Material'
+extend view I_Material with ZX_Material
+association [0..1] to I_ProductHierarchyNode as _ProductHierarchyNode1 on $projection.ProductCategory = _ProductHierarchyNode1.ProductHierarchyNode  
+association [0..1] to I_ProductHierarchyNode as _ProductHierarchyNode2 on $projection.ProductClass = _ProductHierarchyNode2.ProductHierarchyNode  
+association [0..1] to I_ProductHierarchyNode as _ProductHierarchyNode3 on $projection.ProductSubClass = _ProductHierarchyNode3.ProductHierarchyNode  
+association [0..1] to I_ProductHierarchyNode as _ProductHierarchyNode4 on $projection.ProductFamily = _ProductHierarchyNode4.ProductHierarchyNode  
+ {
+  bismt,
+  volum,
+  @ObjectModel.foreignKey.association: '_ProductHierarchyNode1'           
+  cast(left(prdha,2) as prodh1) as ProductCategory,                               
+  @ObjectModel.foreignKey.association: '_ProductHierarchyNode2'           
+  cast(left(prdha,5) as zprodh2) as ProductClass,                              
+  @ObjectModel.foreignKey.association: '_ProductHierarchyNode3'            
+  cast(left(prdha,8) as zprodh3) as ProductSubClass,                                 
+  @ObjectModel.foreignKey.association: '_ProductHierarchyNode4'           
+  cast(left(prdha,13) as zprodh4) as ProductFamily,  
+  _ProductHierarchyNode1,                                                  
+  _ProductHierarchyNode2,                                                 
+  _ProductHierarchyNode3,                                                                              
+  _ProductHierarchyNode4                                                    
+}
