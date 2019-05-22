@@ -1,0 +1,26 @@
+@EndUserText.label: 'Product Hierarchy Node' //same as DDL description
+@Analytics.dataCategory: #DIMENSION //or #CUBE or #FACT
+@VDM.viewType: #BASIC
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@AbapCatalog.sqlViewName: 'IPRODHIERNODE' //must start with "I"
+@ObjectModel.usageType.serviceQuality: #A
+@ObjectModel.usageType.sizeCategory : #S
+@ObjectModel.usageType.dataClass: #MASTER
+@ObjectModel.representativeKey: 'ProductHierarchyNode'
+@ClientHandling.algorithm: #SESSION_VARIABLE
+
+define view I_ProductHierarchyNode //must start with "I_"; same as DDL source name in upper-camelcase notation
+  as select from t179                                                                                                                    
+  association [0..*] to I_ProductHierarchyNodeText as _Text on $projection.ProductHierarchyNode = _Text.ProductHierarchyNode
+  association [0..*] to ZI_ProductHierarchyNodeHier as _Hier on $projection.ProductHierarchyNode = _Hier.ProductHierarchyNodeChild          //Change  
+{
+      //key cast (${DatabaseFieldName} as ${DataElementWithProperLabel}) as ${GlobalFieldName},
+      //_${TargetPublicBasicViewNameWithoutPrefix} //expose the association for use by consumers
+      @ObjectModel.text.association: '_Text'
+      @ObjectModel.Hierarchy.association: '_Hier'                                                                                           //Change 
+  key t179.prodh     as ProductHierarchyNode,
+      t179.stufe     as ProductHierarchyNodeLevel,
+
+      _Text,
+      _Hier                                                                                                                                //Change                                                                                              
+}
