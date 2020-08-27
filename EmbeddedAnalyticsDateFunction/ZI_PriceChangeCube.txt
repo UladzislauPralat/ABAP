@@ -10,8 +10,6 @@ define view ZI_PriceChangeCube as select from ZP_PriceChange
   association [0..1] to ZI_ChangeType           as _ChangeType            on $projection.ChangeType = _ChangeType.ChangeType                                                                                                                                   
   association [0..1] to Rv_P_User               as _User                  on $projection.UserName = _User.userName
   association [0..1] to ZI_TransactionCode      as _TransactionCode       on $projection.TransactionCode = _TransactionCode.TransactionCode
-  association [0..1] to ZI_ChangeDocFieldValue as _ChangeDocFieldValueOld on $projection.OldValue  = _ChangeDocFieldValueOld.ChangeDocFieldValue
-  association [0..1] to ZI_ChangeDocFieldValue as _ChangeDocFieldValueNew on $projection.NewValue  = _ChangeDocFieldValueNew.ChangeDocFieldValue  
   association [0..1] to ZI_ConditionUsage       as _ConditionUsage        on $projection.ConditionUsage = _ConditionUsage.ConditionUsage
   association [0..1] to ZI_ConditionApplication as _ConditionApplication  on $projection.ConditionApplication = _ConditionApplication.ConditionApplication  
   association [0..1] to ZI_ConditionType        as _ConditionType         on $projection.ConditionUsage = _ConditionType.ConditionUsage
@@ -37,19 +35,14 @@ define view ZI_PriceChangeCube as select from ZP_PriceChange
   UpdateTime,
   @ObjectModel.foreignKey.association: '_TransactionCode'  
   TransactionCode,
-//  OldValue,
- // NewValue,
-  
-    @ObjectModel.foreignKey.association: '_ChangeDocFieldValueNew'  
   case when FieldName = 'KEY' then '*** Created ***'
-       when NewValue = '' and CurrencyNew = '' then ' '
-       else cast(ltrim(concat_with_space(NewValue,CurrencyNew,1),' ') as zcdfldvaln) 
-  end  as NewValue,
-  @ObjectModel.foreignKey.association: '_ChangeDocFieldValueOld'
-  cast( case ltrim(concat_with_space(OldValue,CurrencyOld,1),' ')
+       when ValueNew = '' and CurrencyNew = '' then ' '
+       else cast(ltrim(concat_with_space(ValueNew,CurrencyNew,1),' ') as zcdfldvaln) 
+  end  as ValueNew,
+  cast( case ltrim(concat_with_space(ValueOld,CurrencyOld,1),' ')
   when '' then ' '
-  else ltrim(concat_with_space(OldValue,CurrencyOld,1),' ') end as zcdfldvalo) as OldValue,
-  
+  else ltrim(concat_with_space(ValueOld,CurrencyOld,1),' ') end as zcdfldvalo) 
+  as ValueOld,
   Agreement,
   SalesDeal,
   Promotion,
@@ -83,8 +76,6 @@ define view ZI_PriceChangeCube as select from ZP_PriceChange
   _ChangeType,  
   _User,
   _TransactionCode,
-  _ChangeDocFieldValueNew,  
-  _ChangeDocFieldValueOld,  
   _ConditionUsage,
   _ConditionApplication,  
   _ConditionType,

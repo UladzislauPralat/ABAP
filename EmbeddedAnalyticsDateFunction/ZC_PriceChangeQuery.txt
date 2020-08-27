@@ -1,0 +1,111 @@
+@AbapCatalog.sqlViewName: 'ZCPRCCHGQ'
+@VDM.viewType: #CONSUMPTION
+@Analytics.query: true
+@AccessControl.authorizationCheck: #CHECK
+@EndUserText.label: 'Price Change'
+define view ZC_PriceChangeQuery
+  with parameters
+  @EndUserText.label: 'Date Function'                              
+  @Consumption: { valueHelp: '_DateFunction.DateFunction', defaultValue: 'PREVIOUSMONTH' }  
+  P_DateFunction : datefunctionid,
+  @Consumption.derivation: { lookupEntity: 'C_SglGregorianCalDateFunction', 
+  resultElement: 'DateFunctionStartDate', binding: [ {
+    targetParameter: 'P_DateFunction', type: #PARAMETER, value : 'P_DateFunction' },
+     { targetParameter : 'P_Language' , type : #SYSTEM_FIELD, value : '#SYSTEM_LANGUAGE'  } ] 
+  } 
+  @Consumption.hidden: true
+  P_StartDate: /srmsmc/puc_spend_valid_from ,
+  @Consumption.derivation: { lookupEntity: 'C_SglGregorianCalDateFunction', 
+  resultElement: 'DateFunctionEndDate', binding: [ {
+    targetParameter: 'P_DateFunction', type: #PARAMETER, value : 'P_DateFunction' },
+     { targetParameter : 'P_Language' , type : #SYSTEM_FIELD, value : '#SYSTEM_LANGUAGE'  } ] 
+  } 
+  @Consumption.hidden: true
+    P_EndDate: /srmsmc/puc_spend_valid_to
+ as select from ZI_PriceChangeCube
+   association[1] to ZI_DateFunction as _DateFunction on _DateFunction.DateFunction <> ''
+ {
+  @AnalyticsDetails.query.axis: #FREE
+  ConditionRecordNo,
+  @AnalyticsDetails.query.axis: #FREE    
+  ChangeNumber,
+  @AnalyticsDetails.query.axis: #FREE  
+  TableKey,
+  @AnalyticsDetails.query.axis: #ROWS 
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 1  
+  UdateDate,
+  @AnalyticsDetails.query.axis: #ROWS
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 2      
+  UpdateTime,
+  @AnalyticsDetails.query.axis: #ROWS  
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 4     
+  TransactionCode,
+  @AnalyticsDetails.query.axis: #ROWS  
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 3   
+  UserName,
+  @AnalyticsDetails.query.axis: #ROWS
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 9       
+  TableName,    
+ // @AnalyticsDetails.query.axis: #ROWS  
+ // ConditionType,  
+  @AnalyticsDetails.query.axis: #ROWS  
+  SalesOrganization,
+  @AnalyticsDetails.query.axis: #ROWS  
+  DistributionChannel,
+  @AnalyticsDetails.query.axis: #ROWS  
+  Customer,
+  @AnalyticsDetails.query.axis: #ROWS  
+  Material,
+  @AnalyticsDetails.query.axis: #ROWS  
+  FieldName,
+  @AnalyticsDetails.query.axis: #FREE  
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 12    
+  ChangeType,      
+  @AnalyticsDetails.query.axis: #ROWS  
+  ValueOld,
+  @AnalyticsDetails.query.axis: #ROWS  
+  ValueNew,
+  @AnalyticsDetails.query.axis: #ROWS  
+  ValidityPeriod,  
+  @AnalyticsDetails.query.axis: #COLUMNS    
+  PriceChangeCount,  
+  @AnalyticsDetails.query.axis: #FREE  
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 5     
+  Agreement,
+  @AnalyticsDetails.query.axis: #FREE
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 6       
+  SalesDeal,
+  @AnalyticsDetails.query.axis: #FREE
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 7     
+  Promotion,
+  @AnalyticsDetails.query.axis: #FREE  
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 8    
+  ConditionUsage,
+  @AnalyticsDetails.query.axis: #FREE
+  ConditionApplication,
+  @AnalyticsDetails.query.axis: #FREE  
+  ConditionTable,
+  @AnalyticsDetails.query.axis: #FREE   
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 10    
+  ValidFrom,
+  @AnalyticsDetails.query.axis: #FREE   
+  @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
+  @AnalyticsDetails.query.variableSequence: 11   
+  ValidTo,
+  @AnalyticsDetails.query.axis: #FREE 
+  Unit,
+  _DateFunction  
+} 
+where UdateDate between $parameters.P_StartDate and $parameters.P_EndDate
+
