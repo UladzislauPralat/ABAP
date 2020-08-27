@@ -1,0 +1,16 @@
+@AbapCatalog.sqlViewName: 'ZICHGTPT'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@ObjectModel.dataCategory: #TEXT
+@VDM.viewType: #BASIC
+@EndUserText.label: 'Change Type'
+define view ZI_ChangeTypeText as select from dd07t 
+{
+  key cast(substring(domvalue_l,1,1) as cdchngind) as ChangeType,
+  @Semantics.language: true
+  key ddlanguage as Language,
+  @Semantics.text: true
+  ddtext as ApplicationName     
+}
+where domname = 'CDCHNGIND'
+  and as4local = 'A'
+  and as4vers  = '0000'

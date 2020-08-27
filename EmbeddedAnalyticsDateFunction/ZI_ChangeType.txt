@@ -1,0 +1,17 @@
+@AbapCatalog.sqlViewName: 'ZICHGTP'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@VDM.viewType: #BASIC
+@Analytics.dataCategory: #DIMENSION
+@EndUserText.label: 'Change Type'
+define view ZI_ChangeType as select from dd07l 
+  association [0..*] to ZI_ChangeTypeText as _Text on $projection.ChangeType = _Text.ChangeType
+{
+  @ObjectModel.text.association: '_Text'
+  key cast(substring(domvalue_l,1,1) as cdchngind) as ChangeType,
+  _Text    
+}
+where domname = 'CDCHNGIND'
+  and as4local = 'A'
+  and as4vers  = '0000'
+
+  

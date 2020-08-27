@@ -1,0 +1,23 @@
+@AbapCatalog.sqlViewName: 'ZICONDTP'
+@Analytics.dataCategory: #DIMENSION
+@VDM.viewType: #BASIC
+@ObjectModel.representativeKey: 'ConditionType'
+@EndUserText.label: 'Condition Type'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+define view ZI_ConditionType as select from t685 
+  association [0..1] to ZI_ConditionUsage as _ConditionUsage              on $projection.ConditionUsage = _ConditionUsage.ConditionUsage
+  association [0..1] to ZI_ConditionApplication as _ConditionApplication  on $projection.ConditionApplication = _ConditionApplication.ConditionApplication
+  association [0..*] to ZI_ConditionTypeText as _ConditionTypeText        on $projection.ConditionUsage = _ConditionTypeText.ConditionUsage
+                                                                         and $projection.ConditionApplication    = _ConditionTypeText.Application
+                                                                         and $projection.ConditionType  = _ConditionTypeText.ConditionType
+{
+  @ObjectModel.foreignKey.association: '_ConditionUsage'
+  key kvewe as ConditionUsage,
+  @ObjectModel.foreignKey.association: '_ConditionApplication'  
+  key kappl as ConditionApplication,
+  @ObjectModel.text.association: '_ConditionTypeText'
+  key kschl as ConditionType,  
+  _ConditionUsage,  
+  _ConditionApplication,
+  _ConditionTypeText
+}

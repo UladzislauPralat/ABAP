@@ -1,0 +1,16 @@
+@AbapCatalog.sqlViewName: 'ZICONDTPT'
+@ObjectModel.dataCategory: #TEXT
+@VDM.viewType: #BASIC
+@AccessControl.authorizationCheck: #CHECK
+@ObjectModel.representativeKey: 'ConditionType'
+@EndUserText.label: 'Condition Type'
+define view ZI_ConditionTypeText as select from t685t 
+{
+  key kvewe as ConditionUsage,
+  key kappl as Application,
+  key kschl as ConditionType,
+  @Semantics.language: true
+  key spras as Language,
+  @Semantics.text: true
+  vtext as ConditionTypeName      
+}

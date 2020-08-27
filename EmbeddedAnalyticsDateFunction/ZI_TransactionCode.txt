@@ -1,0 +1,13 @@
+@AbapCatalog.sqlViewName: 'ZITRANSCD'
+@EndUserText.label: 'Transaction Code'
+@Analytics.dataCategory: #DIMENSION
+@VDM.viewType: #BASIC
+@ObjectModel.representativeKey: 'TransactionCode'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+define view ZI_TransactionCode as select from tstc  
+  association [0..*] to ZI_TransactionCodeText as _Text on $projection.TransactionCode = _Text.TransactionCode 
+{
+  @ObjectModel.text.association: '_Text'
+  key tcode as TransactionCode,
+  _Text
+}

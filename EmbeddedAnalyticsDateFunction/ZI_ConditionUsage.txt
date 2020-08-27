@@ -1,0 +1,12 @@
+@AbapCatalog.sqlViewName: 'ZICONDU'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@VDM.viewType: #BASIC
+@Analytics.dataCategory: #DIMENSION
+@EndUserText.label: 'Condition Usage'
+define view ZI_ConditionUsage as select from t681v
+  association [0..*] to ZI_ConditionUsageText as _Text on $projection.ConditionUsage = _Text.ConditionUsage 
+{
+  @ObjectModel.text.association: '_Text'
+  key kvewe as ConditionUsage,  
+  _Text 
+}

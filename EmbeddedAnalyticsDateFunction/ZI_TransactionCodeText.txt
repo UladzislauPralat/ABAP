@@ -1,0 +1,14 @@
+@AbapCatalog.sqlViewName: 'ZITRANSCDT'
+@EndUserText.label: 'Transaction Code'
+@ObjectModel.dataCategory: #TEXT
+@VDM.viewType: #BASIC
+@ObjectModel.representativeKey: 'TransactionCode'
+define view ZI_TransactionCodeText as select from tstct
+{
+  key tcode as TransactionCode,
+  @Semantics.language: true
+  key sprsl as Language,
+  @Semantics.text: true
+  ttext as TransactionText    
+}
+

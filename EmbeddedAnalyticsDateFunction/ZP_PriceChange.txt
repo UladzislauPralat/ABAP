@@ -1,0 +1,247 @@
+@AbapCatalog.sqlViewName: 'ZPPRCCHG'
+@VDM.private: true
+@VDM.viewType: #COMPOSITE
+@EndUserText.label: 'Price Change'
+define view ZP_PriceChange as select distinct from cdhdr inner join cdpos
+                                                                     on cdhdr.objectclas = cdpos.objectclas
+                                                                    and cdhdr.objectid   = cdpos.objectid
+                                                                    and cdhdr.changenr   = cdpos.changenr
+                                                             inner join konh
+                                                                     on cdhdr.objectid = konh.knumh
+                                                        left outer join a004
+                                                                     on konh.knumh = a004.knumh
+                                                        left outer join a005
+                                                                     on konh.knumh = a005.knumh
+                                                        left outer join a007
+                                                                     on konh.knumh = a007.knumh
+                                                        left outer join a055
+                                                                     on konh.knumh = a055.knumh
+                                                        left outer join a304
+                                                                     on konh.knumh = a304.knumh
+                                                        left outer join a307
+                                                                     on konh.knumh = a307.knumh
+                                                        left outer join a350
+                                                                     on konh.knumh = a350.knumh
+                                                        left outer join a501
+                                                                     on konh.knumh = a501.knumh
+                                                        left outer join a534
+                                                                     on konh.knumh = a534.knumh
+                                                        left outer join a901
+                                                                     on konh.knumh = a901.knumh
+                                                        left outer join a909
+                                                                     on konh.knumh = a909.knumh
+                                                        left outer join a912
+                                                                     on konh.knumh = a912.knumh
+                                                        left outer join a913
+                                                                     on konh.knumh = a913.knumh
+                                                        left outer join a914
+                                                                     on konh.knumh = a914.knumh
+                                                        left outer join a915
+                                                                     on konh.knumh = a915.knumh
+                                                        left outer join a916
+                                                                     on konh.knumh = a916.knumh
+                                                        left outer join a917
+                                                                     on konh.knumh = a917.knumh
+                                                        left outer join a918
+                                                                     on konh.knumh = a918.knumh
+                                                        left outer join a919
+                                                                     on konh.knumh = a919.knumh
+                                                        left outer join a955
+                                                                     on konh.knumh = a955.knumh
+                                                        left outer join a956
+                                                                     on konh.knumh = a956.knumh
+                                                        left outer join a958
+                                                                     on konh.knumh = a958.knumh
+                                                        left outer join a964
+                                                                     on konh.knumh = a964.knumh
+                                                        left outer join a968
+                                                                     on konh.knumh = a968.knumh
+                                                        left outer join a969
+                                                                     on konh.knumh = a969.knumh
+                                                        left outer join a970
+                                                                     on konh.knumh = a970.knumh
+                                                        left outer join a971
+                                                                     on konh.knumh = a971.knumh
+                                                        left outer join a975
+                                                                     on konh.knumh = a975.knumh
+                                                        left outer join a978
+                                                                     on konh.knumh = a978.knumh
+                                                        left outer join a979
+                                                                     on konh.knumh = a979.knumh
+                                                        left outer join a980
+                                                                     on konh.knumh = a980.knumh
+                                                        left outer join a982
+                                                                     on konh.knumh = a982.knumh
+                                                        left outer join a983
+                                                                     on konh.knumh = a983.knumh
+                                                        left outer join a984
+                                                                     on konh.knumh = a984.knumh
+                                                        left outer join a985
+                                                                     on konh.knumh = a985.knumh
+                                                        left outer join a986
+                                                                     on konh.knumh = a986.knumh
+                                                        left outer join a987
+                                                                     on konh.knumh = a987.knumh
+                                                        left outer join a988
+                                                                     on konh.knumh = a988.knumh
+                                                        left outer join a989
+                                                                     on konh.knumh = a989.knumh
+                                                        left outer join a990
+                                                                     on konh.knumh = a990.knumh
+                                                        left outer join a993
+                                                                     on konh.knumh = a993.knumh
+                                                        left outer join a994
+                                                                     on konh.knumh = a994.knumh
+                                                        left outer join a996
+                                                                     on konh.knumh = a996.knumh
+                                                        left outer join a999
+                                                                     on konh.knumh = a999.knumh
+{
+  key cast(substring(cdhdr.objectid,1,10) as knumh) as ConditionRecordNo,
+  key cdhdr.changenr as ChangeNumber,
+  key cdpos.tabname as TableName,  
+  key cdpos.tabkey as TableKey,
+  key cdpos.fname as FieldName,  
+  key cdpos.chngind as ChangeType,
+  cdhdr.username as UserName,
+  cdhdr.udate as UdateDate,
+  cdhdr.utime as UpdateTime,
+  cdhdr.tcode as TransactionCode,
+  cdpos.value_old as OldValue,
+  cdpos.value_new as NewValue,
+  cdpos.cuky_old as CurrencyOld,
+  cdpos.cuky_new as CurrencyNew,
+  konh.knuma_bo as Agreement,
+  konh.knuma_ag as SalesDeal,
+  konh.knuma_pi as Promotion,
+  konh.kvewe as ConditionUsage,
+  konh.kappl as ConditionApplication,
+  konh.kschl as ConditionType,
+  konh.kotabnr as ConditionTable,
+  case konh.kotabnr 
+  when '004' then a004.vkorg
+  when '004' then a004.vkorg
+  when '005' then a005.vkorg
+  when '007' then a007.vkorg
+  when '304' then a304.vkorg
+  when '307' then a307.vkorg
+  when '350' then a350.vkorg
+  when '501' then a501.vkorg
+  when '534' then a534.vkorg
+  when '901' then a901.vkorg
+  when '909' then a909.vkorg
+  when '912' then a912.vkorg
+  when '913' then a913.vkorg
+  when '914' then a914.vkorg
+  when '915' then a915.vkorg
+  when '916' then a916.vkorg
+  when '917' then a917.vkorg
+  when '918' then a918.vkorg
+  when '919' then a919.vkorg
+  when '955' then a955.vkorg
+  when '956' then a956.vkorg
+  when '958' then a958.vkorg
+  when '968' then a968.vkorg
+  when '969' then a969.vkorg
+  when '970' then a970.vkorg
+  when '971' then a971.vkorg
+  when '978' then a978.vkorg
+  when '979' then a979.vkorg
+  when '980' then a980.vkorg
+  when '982' then a982.vkorg
+  when '983' then a983.vkorg
+  when '984' then a984.vkorg
+  when '985' then a985.vkorg
+  when '986' then a986.vkorg
+  when '987' then a987.vkorg
+  when '988' then a988.vkorg
+  when '989' then a989.vkorg
+  when '990' then a990.vkorg
+  when '993' then a993.vkorg
+  when '994' then a994.vkorg
+  when '996' then a996.vkorg
+  when '999' then a999.vkorg
+  else cast('' as vkorg) 
+  end as SalesOrganization,
+  case konh.kotabnr
+  when '004' then a004.vtweg
+  when '005' then a005.vtweg
+  when '007' then a007.vtweg
+  when '304' then a304.vtweg
+  when '307' then a307.vtweg
+  when '501' then a501.vtweg
+  when '534' then a534.vtweg
+  when '901' then a901.vtweg
+  when '909' then a909.vtweg
+  when '914' then a914.vtweg
+  when '915' then a915.vtweg
+  when '916' then a916.vtweg
+  when '917' then a917.vtweg
+  when '919' then a919.vtweg
+  when '958' then a958.vtweg
+  when '968' then a968.vtweg
+  when '969' then a969.vtweg
+  when '970' then a970.vtweg
+  when '971' then a971.vtweg
+  when '978' then a978.vtweg
+  when '979' then a979.vtweg
+  when '980' then a980.vtweg
+  when '982' then a982.vtweg
+  when '983' then a983.vtweg
+  when '984' then a984.vtweg
+  when '985' then a985.vtweg
+  when '986' then a986.vtweg
+  when '987' then a987.vtweg
+  when '988' then a988.vtweg
+  when '989' then a989.vtweg
+  when '990' then a990.vtweg
+  when '993' then a993.vtweg
+  when '996' then a996.vtweg
+  when '999' then a999.vtweg
+  else cast('' as vtweg) 
+  end as DistributionChannel, 
+  case konh.kotabnr 
+  when '005' then a005.kunnr
+  when '007' then a007.kunnr
+  when '307' then a307.kunnr
+  when '971' then a971.kunnr
+  when '975' then a975.kunnr
+  when '980' then a980.kunnr
+  when '983' then a983.kunnr
+  when '993' then a993.kunnr
+  else cast('' as kunnr) 
+  end as Customer,
+  case konh.kotabnr  
+  when '004' then a004.matnr
+  when '005' then a005.matnr
+  when '055' then a055.matnr
+  when '304' then a304.matnr
+  when '534' then a534.matnr
+  when '909' then a909.matnr
+  when '913' then a913.matnr
+  when '916' then a916.matnr
+  when '918' then a918.matnr
+  when '956' then a956.matnr
+  when '958' then a958.matnr
+  when '964' then a964.matnr
+  when '970' then a970.matnr
+  when '971' then a971.matnr
+  when '975' then a975.matnr
+  when '979' then a979.matnr
+  when '982' then a982.matnr
+  when '985' then a985.matnr
+  when '986' then a986.matnr
+  when '987' then a987.matnr
+  when '988' then a988.matnr
+  when '989' then a989.matnr
+  when '993' then a993.matnr
+  when '994' then a994.matnr
+  when '996' then a996.matnr
+  else cast('' as matnr) 
+  end as Material,
+  konh.datab as ValidFrom,
+  konh.datbi as ValidTo,
+  @EndUserText.label: 'Validity Period'
+  cast(concat(konh.datab,konh.datbi) as zdate_range) as ValidityPeriod  
+}
+where cdhdr.objectclas = 'COND_A' 

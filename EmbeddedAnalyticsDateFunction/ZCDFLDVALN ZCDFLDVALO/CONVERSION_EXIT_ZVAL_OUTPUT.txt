@@ -1,0 +1,25 @@
+FUNCTION conversion_exit_zval_output.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  IMPORTING
+*"     REFERENCE(INPUT)
+*"  EXPORTING
+*"     REFERENCE(OUTPUT)
+*"----------------------------------------------------------------------
+TYPES: dec13_2 TYPE p LENGTH 13 DECIMALS 2.
+TYPES: dec13_3 TYPE p LENGTH 13 DECIMALS 3.
+
+  IF matches( val = input regex = '^[0-9]{1,}[.|,][0-9][0-9] [A-Z]{3,5}$' ).
+    SPLIT input AT SPACE INTO DATA(w_amount) DATA(w_currency).
+    REPLACE ALL OCCURRENCES OF ',' IN w_amount WITH '.'.
+    output = |{ CONV dec13_2( w_amount ) NUMBER = ENVIRONMENT ALIGN = RIGHT } { w_currency }|.
+  ELSEIF matches( val = input regex = '^[0-9]{8}$' ).
+    WRITE: CONV d( input ) TO output.
+  ELSEIF matches( val = input regex = '^[0-9]{1,}[.|,][0-9][0-9]-{0,1} 3$' ).
+    SPLIT input AT SPACE INTO DATA(w_percent) DATA(w_percent_uom).
+    output = |{ CONV dec13_3( w_percent / 10 ) } %|.
+  ELSE.
+    output = input.
+  ENDIF.
+
+ENDFUNCTION.

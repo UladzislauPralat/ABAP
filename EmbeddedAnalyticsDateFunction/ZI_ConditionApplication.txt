@@ -1,0 +1,12 @@
+@AbapCatalog.sqlViewName: 'ZICONDAPPL'
+@AbapCatalog.compiler.compareFilter: true
+@AbapCatalog.preserveKey: true
+@AccessControl.authorizationCheck: #CHECK
+@EndUserText.label: 'Condition Application'
+define view ZI_ConditionApplication as select from t681a 
+  association [0..*] to ZI_ConditionApplicationText as _Text on $projection.ConditionApplication = _Text.ConditionApplication
+{
+  @ObjectModel.text.association: '_Text'
+  key kappl as ConditionApplication,   
+  _Text   
+}

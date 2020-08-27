@@ -1,0 +1,14 @@
+FUNCTION conversion_exit_zdtrg_output.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  IMPORTING
+*"     REFERENCE(INPUT)
+*"  EXPORTING
+*"     REFERENCE(OUTPUT)
+*"----------------------------------------------------------------------
+
+  DATA(w_date_from) = CONV dats( input+0(8) ).
+  DATA(w_date_to) = CONV dats( input+8(8) ).
+  output = |{ w_date_from DATE = ENVIRONMENT } - { w_date_to DATE = ENVIRONMENT } |.
+
+ENDFUNCTION.

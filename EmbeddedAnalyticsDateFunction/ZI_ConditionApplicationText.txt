@@ -1,0 +1,12 @@
+@AbapCatalog.sqlViewName: 'ZICONDAPPLT'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@ObjectModel.dataCategory: #TEXT
+@VDM.viewType: #BASIC
+@EndUserText.label: 'Condition Application'
+define view ZI_ConditionApplicationText as select from t681b {
+  key kappl as ConditionApplication,
+  @Semantics.language: true
+  key spras as Language,
+  @Semantics.text: true
+  vtext as ApplicationName
+}

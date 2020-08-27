@@ -1,0 +1,12 @@
+@AbapCatalog.sqlViewName: 'ZICONDUT'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@ObjectModel.dataCategory: #TEXT
+@VDM.viewType: #BASIC
+@EndUserText.label: 'Condition Usage'
+define view ZI_ConditionUsageText as select from t681w {
+  key kvewe as ConditionUsage,
+  @Semantics.language: true
+  key spras as Language,
+  @Semantics.text: true
+  vtext as ApplicationName    
+}
