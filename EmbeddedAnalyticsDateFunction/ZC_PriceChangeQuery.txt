@@ -51,8 +51,8 @@ define view ZC_PriceChangeQuery
   @Consumption.filter: {selectionType: #RANGE, mandatory: false, multipleSelections: true}
   @AnalyticsDetails.query.variableSequence: 9       
   TableName,    
- // @AnalyticsDetails.query.axis: #ROWS  
- // ConditionType,  
+  @AnalyticsDetails.query.axis: #ROWS  
+  ConditionType,  
   @AnalyticsDetails.query.axis: #ROWS  
   SalesOrganization,
   @AnalyticsDetails.query.axis: #ROWS  
