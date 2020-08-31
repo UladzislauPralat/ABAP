@@ -4,9 +4,9 @@
 @ObjectModel.representativeKey: 'TableName'
 @EndUserText.label: 'Table Name'
 define view ZI_TableNameText as select from dd02l inner join dd02t
-                                                          on dd02l.tabname  = dd02l.tabname
-                                                         and dd02l.as4local = dd02l.as4local
-                                                         and dd02l.as4vers  = dd02l.as4vers                                                         
+                                                          on dd02l.tabname  = dd02t.tabname
+                                                         and dd02l.as4local = dd02t.as4local
+                                                         and dd02l.as4vers  = dd02t.as4vers                                                         
 {
   key dd02l.tabname as TableName, 
   @Semantics.language: true
