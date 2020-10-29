@@ -1,0 +1,52 @@
+@AbapCatalog.preserveKey: true
+@AbapCatalog: {
+                sqlViewName: 'ZPMATSTKQTYVALC1',
+                compiler.compareFilter: true
+             }
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@ClientHandling.algorithm: #SESSION_VARIABLE
+@VDM:{
+       viewType: #COMPOSITE,
+       private: true
+    }
+define view ZP_MatStkQtyValCur1 as select from ZP_MatStkQtyValCur2
+{
+  key Material,
+  key Plant,
+  key StorageLocation,
+  key Batch,
+  key Supplier,
+  key SDDocument,
+  key SDDocumentItem,
+  key WBSElementInternalID,
+  key Customer,
+  key SpecialStockIdfgStockOwner,    
+  key InventoryStockType,
+  key InventorySpecialStockType, 
+  key MaterialBaseUnit,  
+  key CompanyCode,               //Uladzislau Pralat
+  key GLAccount,                 //Uladzislau Pralat
+  key Currency, 
+  cast(sum(MatlWrhsStkQtyInMatlBaseUnit) as nsdm_material_stock_in_buom preserving type ) as MatlWrhsStkQtyInMatlBaseUnit,
+  cast(sum(StockValueInCCCrcy) as nsdm_stock_value_in_cccrcy preserving type )            as StockValueInCCCrcy,
+-- provide the current date as "calculated" field to have the current date avilable for the consuming view for the currency conversion
+  $session.system_date as CurrentDate 
+}
+ group by
+  Material,
+  Plant,
+  StorageLocation,  
+  Batch,
+  Supplier,
+  SDDocument,
+  SDDocumentItem,
+  WBSElementInternalID,
+  Customer,
+  SpecialStockIdfgStockOwner,    
+  InventoryStockType,
+  InventorySpecialStockType,  
+  MaterialBaseUnit,
+  CompanyCode,                    //Uladzislau Pralat
+  GLAccount,                      //Uladzislau Pralat
+  Currency
+

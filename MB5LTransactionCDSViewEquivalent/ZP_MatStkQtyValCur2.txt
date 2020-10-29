@@ -1,0 +1,45 @@
+@AbapCatalog.preserveKey: true
+@AbapCatalog: {
+                sqlViewName: 'ZPMATSTKQTYVALC2',
+                compiler.compareFilter: true
+             }
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@ClientHandling.algorithm: #SESSION_VARIABLE
+@VDM:{
+       viewType: #COMPOSITE,
+       private: true
+    }
+define view ZP_MatStkQtyValCur2 as select from ZP_MatStkQtyValCur3
+ {  
+  key Material,
+  key Plant,
+  key StorageLocation,
+  key Batch,
+  key Supplier,
+  key SDDocument,
+  key SDDocumentItem,
+  key WBSElementInternalID,
+  key Customer,
+  key SpecialStockIdfgStockOwner,    
+  key InventoryStockType,
+  key InventorySpecialStockType,
+  key MaterialBaseUnit,
+  key CostEstimate,
+  key CompanyCode, //Uladzislau Pralat                     
+  key GLAccount,   //Uladzislau Pralat          
+      cast(MatlWrhsStkQtyInMatlBaseUnit  as nsdm_material_stock_in_buom )   as MatlWrhsStkQtyInMatlBaseUnit,
+-- Calculate the value from the current valid price for the stock quanitity above      
+      cast( round(
+                   cast(MatlWrhsStkQtyInMatlBaseUnit as abap.dec( 21, 3 )) *
+                   division(
+                              cast(_CurrentInvtryPrice.InventoryPrice as abap.dec( 11, 2 )),
+                              cast(_CurrentInvtryPrice.MaterialPriceUnitQty as abap.dec( 5, 0 )),
+                              5
+                           )
+                    , 2
+                 )
+                as nsdm_stock_value_in_cccrcy
+          ) as StockValueInCCCrcy,
+      _CompanyCode.Currency
+}
+

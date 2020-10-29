@@ -1,0 +1,18 @@
+@AbapCatalog.sqlViewName: 'ZICURRMATPRICE'
+@AbapCatalog.compiler.compareFilter: true
+@AbapCatalog.preserveKey: true
+@AccessControl.authorizationCheck: #CHECK
+@EndUserText.label: 'Current material price by cost estimate'
+define view ZI_CurrentMatlPriceByCostEst 
+  as select from ZP_CurrentMatlPriceByCostEst1 left outer join ZP_CompanyCodeGLAccount
+                                                            on ZP_CurrentMatlPriceByCostEst1.ValuationArea = ZP_CompanyCodeGLAccount.ValuationArea
+                                                           and ZP_CurrentMatlPriceByCostEst1.ValuationClass = ZP_CompanyCodeGLAccount.ValuationClass  
+{
+  ZP_CurrentMatlPriceByCostEst1.CostEstimate,
+  ZP_CurrentMatlPriceByCostEst1.ValuationArea,
+  ZP_CurrentMatlPriceByCostEst1.ValuationClass,
+  ZP_CompanyCodeGLAccount.CompanyCode,                            //Uladzislau Pralat     
+  ZP_CompanyCodeGLAccount.GLAccount,                              //Uladzislau Pralat
+  ZP_CurrentMatlPriceByCostEst1.MaterialPriceUnitQty, 
+  ZP_CurrentMatlPriceByCostEst1.InventoryPrice
+}

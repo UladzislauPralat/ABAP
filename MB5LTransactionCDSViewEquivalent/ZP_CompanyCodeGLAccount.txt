@@ -1,0 +1,16 @@
+@AbapCatalog.sqlViewName: 'ZPCOMPCODEGLACC'
+@EndUserText.label: 'Company Account'
+define view ZP_CompanyCodeGLAccount as select distinct from t001 inner join t001k
+                                                                         on t001.bukrs = t001k.bukrs
+                                                                 inner join t030
+                                                                         on t001.ktopl = t030.ktopl
+                                                                        and t001k.bwmod = t030.bwmod 
+{
+  t001k.bwkey as ValuationArea,
+  t030.bklas as ValuationClass,
+  t001.bukrs as CompanyCode,
+  t030.konts as GLAccount 
+}
+where t030.ktosl = 'BSX'
+  and t030.komok = ''
+  

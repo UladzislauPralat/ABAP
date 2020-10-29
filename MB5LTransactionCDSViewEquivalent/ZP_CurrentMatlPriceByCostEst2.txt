@@ -1,0 +1,60 @@
+@AbapCatalog.preserveKey: true
+@AbapCatalog: {
+                 sqlViewName: 'ZPCURRMATPRICE2',
+                 compiler.compareFilter: true
+              }
+//@ClientHandling.algorithm: #AUTOMATED
+@ClientHandling.type: #CLIENT_DEPENDENT
+@ObjectModel: {
+                 usageType:{
+                              sizeCategory: #XL,
+                              serviceQuality: #C,
+                              dataClass:#TRANSACTIONAL
+                           }
+              }
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@VDM: {
+         viewType: #COMPOSITE,
+         private: true
+      }
+define view ZP_CurrentMatlPriceByCostEst2 as
+select from Mbv_Mbew
+{
+bwkey as ValuationArea,
+bklas as ValuationClass,          //Uladzislau Pralat
+kaln1 as CostEstimate,
+vprsv as PriceControl, 
+verpr as MovingPrice,
+stprs as StandardPrice,
+peinh as PriceUnit   
+}
+union all select from Mbv_Obew
+{
+bwkey as ValuationArea,
+bklas as ValuationClass,          //Uladzislau Pralat
+kaln1 as CostEstimate,
+vprsv as PriceControl, 
+verpr as MovingPrice,
+stprs as StandardPrice,
+peinh as PriceUnit  
+}
+union all select from Mbv_Ebew
+{
+bwkey as ValuationArea,
+bklas as ValuationClass,          //Uladzislau Pralat
+kaln1 as CostEstimate,
+vprsv as PriceControl, 
+verpr as MovingPrice,
+stprs as StandardPrice,
+peinh as PriceUnit  
+}
+union all select from Mbv_Qbew
+{
+bwkey as ValuationArea,
+bklas as ValuationClass,          //Uladzislau Pralat
+kaln1 as CostEstimate,
+vprsv as PriceControl, 
+verpr as MovingPrice,
+stprs as StandardPrice,
+peinh as PriceUnit  
+}

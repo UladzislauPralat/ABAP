@@ -1,0 +1,151 @@
+@AbapCatalog: {
+                 sqlViewName: 'ZISTOCKQUANVALCR',
+                 compiler.compareFilter: true,
+                 preserveKey: true
+              }
+@AccessControl: {
+                  authorizationCheck: #CHECK,
+                  personalData.blocking: #NOT_REQUIRED   --there are no BP references in table MATDOC with an EndOfPurpose state
+                }
+@EndUserText.label: 'Current Stock Quantity and Value'
+@VDM.lifecycle.contract.type: #PUBLIC_LOCAL_API
+@ObjectModel: {
+                 usageType:{
+                              sizeCategory: #XXL,
+                              serviceQuality: #D,
+                              dataClass:#TRANSACTIONAL
+                           }
+              }
+@ClientHandling.algorithm: #SESSION_VARIABLE
+@VDM: {
+         viewType: #COMPOSITE
+      }
+@Analytics.dataCategory:#CUBE
+@Metadata: {
+              ignorePropagatedAnnotations: true,
+              allowExtensions: true
+           }
+
+define view ZI_StockQuantityCurrentValue
+with parameters
+  @Consumption: {
+                   defaultValue: 'EUR',
+                   valueHelpDefinition: [{
+                                            entity: {
+                                                       name:'I_Currency',
+                                                       element:'Currency'
+                                                    }
+                                        }]
+                }
+  P_DisplayCurrency: vdm_v_display_currency 
+as select from ZP_MatStkQtyValCur1
+  association [0..1] to I_Product                   as _Product                    on  $projection.Product                    = _Product.Product
+  association [0..1] to I_Plant                     as _Plant                      on  $projection.Plant                      = _Plant.Plant
+  association [0..1] to I_StorageLocation           as _StorageLocation            on  $projection.Plant                      = _StorageLocation.Plant
+                                                                                   and $projection.StorageLocation            = _StorageLocation.StorageLocation
+  association [0..1] to I_Supplier                  as _Supplier                   on  $projection.Supplier                   = _Supplier.Supplier
+  association [0..1] to I_Customer                  as _Customer                   on  $projection.Customer                   = _Customer.Customer
+  association [0..1] to I_Supplier                  as _SpecialStockIdfgStockOwner on  $projection.SpecialStockIdfgStockOwner = _SpecialStockIdfgStockOwner.Supplier
+  association [0..1] to I_InventorySpecialStockType as _InventorySpecialStockType  on  $projection.InventorySpecialStockType  = _InventorySpecialStockType.InventorySpecialStockType
+  association [0..1] to I_InventoryStockType        as _InventoryStockType         on  $projection.InventoryStockType         = _InventoryStockType.InventoryStockType
+  association [0..1] to I_Producttype               as _ProductType                on  $projection.ProductType                = _ProductType.ProductType
+  association [0..1] to I_ProductGroup              as _ProductGroup               on  $projection.ProductGroup               = _ProductGroup.MaterialGroup
+  association [0..1] to I_CompanyCode               as _CompanyCode                on  $projection.CompanyCode                = _CompanyCode.CompanyCode         //Uladzislau Pralat
+  association [0..1] to I_GLAccount                 as _GLAccount                  on  $projection.GLAccount                  = _GLAccount.GLAccount             //Uladzislau Pralat 
+                                                                                   and $projection.CompanyCode                = _GLAccount.CompanyCode           //Uladzislau Pralat
+  association [1..1] to I_UnitOfMeasure             as _UnitOfMeasure              on  $projection.MaterialBaseUnit           = _UnitOfMeasure.UnitOfMeasure
+{
+/*  @ObjectModel: {
+                   foreignKey.association: '_Product',
+                   text.element:  [ 'ProductDescription' ]
+                 }*/
+  @ObjectModel.foreignKey.association: '_Product'
+  key Material                                                           as Product,
+/*  @ObjectModel: {
+                  foreignKey.association: '_Plant',
+                  text.element:  [ 'PlantName' ]
+                }*/
+  @ObjectModel.foreignKey.association: '_Plant'
+  key Plant,
+  @ObjectModel.foreignKey.association: '_StorageLocation'   
+  key StorageLocation,
+  key Batch,
+  @ObjectModel.foreignKey.association: '_Supplier'
+  key Supplier,
+  key SDDocument,
+  key SDDocumentItem,
+  key WBSElementInternalID,
+  @ObjectModel.foreignKey.association: '_Customer'
+  key Customer,
+  @ObjectModel.foreignKey.association: '_SpecialStockIdfgStockOwner'
+  key SpecialStockIdfgStockOwner,    
+/*  @ObjectModel: {
+                   foreignKey.association: '_InventoryStockType',
+                   text.element: [ 'InventoryStockTypeName' ]
+                }*/
+  @ObjectModel.foreignKey.association: '_InventoryStockType'
+  key InventoryStockType,
+/*  @ObjectModel: {
+                   foreignKey.association: '_InventorySpecialStockType',
+                   text.element: [ 'InventorySpecialStockTypeName' ]
+                }*/
+  @ObjectModel.foreignKey.association: '_InventorySpecialStockType'
+  key InventorySpecialStockType, 
+  @Semantics.unitOfMeasure: true 
+  key MaterialBaseUnit,
+  @ObjectModel.foreignKey.association: '_CompanyCode'       //Uladzislau Pralat
+  key CompanyCode,                                          //Uladzislau Pralat
+  @ObjectModel.foreignKey.association: '_GLAccount'         //Uladzislau Pralat
+  key GLAccount,                                            //Uladzislau Pralat                           
+  @Semantics.currencyCode: true
+  key Currency, 
+  @Semantics.currencyCode: true
+  cast(:P_DisplayCurrency as vdm_v_display_currency  preserving type )     as DisplayCurrency,
+  @Semantics.quantity.unitOfMeasure: 'MaterialBaseUnit'
+  @DefaultAggregation : #SUM
+  MatlWrhsStkQtyInMatlBaseUnit,
+  @Semantics.amount.currencyCode: 'Currency'
+  @DefaultAggregation : #SUM
+  StockValueInCCCrcy,
+  @Semantics.amount.currencyCode: 'DisplayCurrency'
+  @DefaultAggregation: #SUM
+  cast(currency_conversion( amount             => StockValueInCCCrcy, 
+                            source_currency    => Currency, 
+                            target_currency    => :P_DisplayCurrency, 
+                            exchange_rate_date => CurrentDate ) 
+                       as tb_amount_current preserving type ) as StockValueInDisplayCurrency, 
+/*  @ObjectModel: {
+                  foreignKey.association: '_ProductGroup',
+                  text.element: [ 'MaterialGroupName' ]
+                }*/
+  @ObjectModel.foreignKey.association: '_ProductGroup'
+  _Product.ProductGroup                                                  as ProductGroup,
+/*  @ObjectModel: {
+                   foreignKey.association: '_ProductType',
+                   text.element: [ 'MaterialTypeName' ]
+                }*/ 
+  @ObjectModel.foreignKey.association: '_ProductType'
+  _Product.ProductType                                                   as ProductType,  
+
+--  _Product._MaterialText[1: Language=$session.system_language].ProductDescription                       as ProductDescription,
+--  _Plant.PlantName                                                                                      as PlantName,
+--  _InventoryStockType._Text[1: Language=$session.system_language].InventoryStockTypeName                as InventoryStockTypeName,
+--  _InventorySpecialStockType._Text[1: Language=$session.system_language].InventorySpecialStockTypeName  as InventorySpecialStockTypeName,
+--  _Product._ProductGroupText[1: Language=$session.system_language].MaterialGroupName                    as MaterialGroupName,
+--  _Product._ProductTypeName[1: Language=$session.system_language].MaterialTypeName                      as MaterialTypeName,
+ 
+  _UnitOfMeasure,
+  _CompanyCode,          //Uladzislau Pralat
+  _GLAccount,            //Uladzislau Pralat
+  _Product,    
+  _Plant,
+  _StorageLocation,
+  _Supplier,
+  _Customer,
+  _SpecialStockIdfgStockOwner,
+  _InventoryStockType,
+  _InventorySpecialStockType,
+  _ProductType,
+  _ProductGroup
+}
+

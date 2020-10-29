@@ -1,0 +1,90 @@
+@AbapCatalog.preserveKey: true
+@AbapCatalog:{
+               sqlViewName: 'ZCSTOCKQUANVALCR',
+               compiler.compareFilter: true
+             }
+@AccessControl.authorizationCheck: #PRIVILEGED_ONLY
+@EndUserText.label: 'Current Stock Quantity and Value'
+@ObjectModel:{
+               usageType:{
+                            sizeCategory: #XXL,
+                            serviceQuality: #C,
+                            dataClass:#TRANSACTIONAL
+                         }
+             }
+@ClientHandling.algorithm: #SESSION_VARIABLE
+@VDM:{
+       viewType: #CONSUMPTION,
+       lifecycle:
+                  {
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// This view can not be annotated by @OData.publish: true because the view name exceeds 26 characters
+// As for the consumption an OData service is requiered to be consumed via SAP Analytics Cloud (SAC) (and a role too)
+// this view will be deprecated and replaced by the successor view C_StockQtyCurrentValue_2  which has right now (August 2018)
+// the exact same structure and functionality
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    status: #DEPRECATED,
+                    successor: 'C_StockQtyCurrentValue_2 '
+                  }
+     }
+@Analytics.query: true
+
+define view ZC_StockQuantityCurrentValue
+with parameters
+  @Consumption: {
+                   defaultValue: 'EUR',
+                   valueHelpDefinition: [{
+                                            entity: {
+                                                       name:'I_Currency',
+                                                       element:'Currency'
+                                                    }
+                                        }]
+                }
+  P_DisplayCurrency: nsdm_display_currency
+as select from ZI_StockQuantityCurrentValue (P_DisplayCurrency : $parameters.P_DisplayCurrency)
+{
+//@AnalyticsDetails.query.axis: #ROWS     //Uladzislau Pralat
+  @Consumption: {
+     filter: { selectionType: #RANGE,
+               mandatory: false,
+               multipleSelections: true }
+  }
+  Product,
+//@AnalyticsDetails.query.axis: #ROWS     //Uladzislau Pralat
+  @Consumption: {
+     filter: { selectionType: #RANGE,
+               mandatory: false,
+               multipleSelections: true }
+  }
+  Plant,
+  StorageLocation,
+  Batch,
+  Supplier,
+  SDDocument,
+  SDDocumentItem,
+  WBSElementInternalID,
+  Customer,
+  SpecialStockIdfgStockOwner,    
+  InventoryStockType,
+  InventorySpecialStockType,  
+  ProductGroup,
+  ProductType,  
+
+  MaterialBaseUnit,
+  @AnalyticsDetails.query.axis: #ROWS     //Uladzislau Pralat  
+  CompanyCode,                            //Uladzislau Pralat
+  @AnalyticsDetails.query.axis: #ROWS     //Uladzislau Pralat    
+  GLAccount,                              //Uladzislau Pralat
+  Currency, 
+  DisplayCurrency,
+ 
+// Quantity and Value
+  @AnalyticsDetails.query.axis: #COLUMNS
+  StockValueInCCCrcy, 
+  @AnalyticsDetails.query.axis: #COLUMNS
+  MatlWrhsStkQtyInMatlBaseUnit,
+  @AnalyticsDetails.query.axis: #COLUMNS
+  @AnalyticsDetails.query.hidden: true
+  StockValueInDisplayCurrency
+}
+

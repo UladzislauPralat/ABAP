@@ -1,0 +1,51 @@
+@AbapCatalog.preserveKey: true
+@AbapCatalog: {
+                sqlViewName: 'ZPMATSTKQTYVALC3',
+                compiler.compareFilter: true
+             }
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@ClientHandling.algorithm: #SESSION_VARIABLE
+@VDM:{
+       viewType: #COMPOSITE,
+       private: true
+    }
+define view ZP_MatStkQtyValCur3 as select from ZI_MaterialStock 
+{
+  key Material,
+  key Plant,
+  key StorageLocation,
+  key Batch,
+  key Supplier,
+  key SDDocument,
+  key SDDocumentItem,
+  key WBSElementInternalID,
+  key Customer,
+  key SpecialStockIdfgStockOwner,    
+  key InventoryStockType,
+  key InventorySpecialStockType,
+  key MaterialBaseUnit,
+  key CostEstimate,
+      CompanyCode,     //Uladzislau Pralat
+      GLAccount,       //Uladzislau Pralat
+      sum(MatlWrhsStkQtyInMatlBaseUnit) as MatlWrhsStkQtyInMatlBaseUnit,
+      _CurrentInvtryPrice,
+      _CompanyCode
+}
+  group by
+  Material,
+  Plant,
+  StorageLocation,
+  Batch,
+  Supplier,
+  SDDocument,
+  SDDocumentItem,
+  WBSElementInternalID,
+  Customer,
+  SpecialStockIdfgStockOwner,    
+  InventoryStockType,
+  InventorySpecialStockType,  
+  MaterialBaseUnit,
+  CostEstimate,
+  GLAccount,          //Uladzislau Pralat
+  CompanyCode         //Uladzislau Pralat
+

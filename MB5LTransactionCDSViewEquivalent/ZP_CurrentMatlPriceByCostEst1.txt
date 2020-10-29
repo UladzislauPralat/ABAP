@@ -1,0 +1,34 @@
+@AbapCatalog.preserveKey: true
+@AbapCatalog: {
+                 sqlViewName: 'ZPCURRMATPRICE1',
+                 compiler.compareFilter: true
+              }
+//@ClientHandling.algorithm: #SESSION_VARIABLE
+@ClientHandling.type: #CLIENT_DEPENDENT
+@ObjectModel: {
+                 usageType:{
+                              sizeCategory: #XL,
+                              serviceQuality: #C,
+                              dataClass:#TRANSACTIONAL
+                           }
+              }
+@AccessControl.authorizationCheck: #CHECK
+@EndUserText.label: 'Current material price by cost estimate'
+@VDM: {
+         viewType: #COMPOSITE,
+         private: false
+      }
+@Metadata.ignorePropagatedAnnotations: true
+define view ZP_CurrentMatlPriceByCostEst1 as select from ZP_CurrentMatlPriceByCostEst2
+{
+  CostEstimate,
+  ValuationArea,
+  ValuationClass,         //Uladzislau Pralat
+  max (PriceUnit) as MaterialPriceUnitQty,
+  max (case PriceControl when 'V' then MovingPrice
+                                  else StandardPrice end ) as InventoryPrice                                     
+}
+where PriceUnit > 0
+   and mandt = $session.client
+group by CostEstimate, ValuationArea, ValuationClass
+
