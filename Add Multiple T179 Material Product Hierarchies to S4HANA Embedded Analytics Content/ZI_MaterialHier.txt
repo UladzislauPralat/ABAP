@@ -1,0 +1,32 @@
+@AbapCatalog.sqlViewName: 'ZIMATHIER'
+@EndUserText.label: 'Material'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@VDM.viewType: #BASIC
+@ObjectModel.dataCategory: #HIERARCHY
+@Hierarchy.parentChild: [{
+rootNode.visibility:#ADD_ROOT_NODE,
+siblingsOrder: [{ by: 'nodeid', direction: #ASC }],
+recurseBy: '_parent',
+directory: '_MaterialHierDir'  
+ }]
+define view ZI_MaterialHier as select from ZI_Material
+  association[0..1] to ZI_MaterialHierDir      as _MaterialHierDir       on $projection.MaterialHier  = _MaterialHierDir.MaterialHier
+  association[0..1] to ZI_MaterialHier         as _parent                on $projection.parentid = _parent.nodeid
+  association[0..1] to I_ProductHierarchyNode  as _ProductHierarchyNode  on $projection.prodh = _ProductHierarchyNode.ProductHierarchyNode
+                                                                        and $projection.material = ''
+  association[0..1] to I_Material              as _Material              on $projection.material = _Material.Material
+                                                                        and $projection.prodh = ''                    
+{
+  @ObjectModel.foreignKey.association: '_MaterialHierDir'
+  key MaterialHier,
+  key nodeid, 
+  parentid,
+  @ObjectModel.foreignKey.association: '_ProductHierarchyNode'  
+  prodh,
+  @ObjectModel.foreignKey.association: '_Material'
+  material,
+  _MaterialHierDir,
+  _parent,
+  _ProductHierarchyNode,
+  _Material 
+}

@@ -1,0 +1,27 @@
+@ObjectModel.representativeKey: 'MaterialHier'
+@EndUserText.label: 'Material Hierarchy'
+@Analytics: { dataCategory: #DIMENSION }
+@VDM.viewType: #BASIC
+@AbapCatalog.sqlViewName: 'ZIMATHIERDIR'
+@AccessControl.authorizationCheck: #CHECK
+define view ZI_MaterialHierDir as select from tadir 
+{
+  @ObjectModel.text.element: ['MaterialHierDesc']
+  key cast('LEVEL4' as hryid ) as MaterialHier,
+  @Semantics.text: true
+  cast('Level 4' as abap.char(40) ) as MaterialHierDesc  
+}
+where object = 'DDLS'
+  and obj_name = 'ZI_MATERIALHIERDIR'
+
+union all  
+
+select from tadir 
+{
+  @ObjectModel.text.element: ['MaterialHierDesc']
+  key cast('LEVEL3' as hryid ) as MaterialHier,
+  @Semantics.text: true
+  cast('Level 3' as abap.char(40) ) as MaterialHierDesc  
+}
+where object = 'DDLS'
+  and obj_name = 'ZI_MATERIALHIERDIR'
