@@ -1,0 +1,97 @@
+class ZCL_RSROA_VARIABLES_EXIT definition
+  public
+  final
+  create public .
+
+public section.
+
+  interfaces IF_BADI_INTERFACE .
+  interfaces IF_RSROA_VARIABLES_EXIT_BADI .
+protected section.
+private section.
+
+  methods GET_POSTINGDATE
+    returning
+      value(RT_RANGE) type RSR_T_RANGESID .
+  methods CHECK
+    importing
+      !I_T_VAR_RANGE type RRS0_T_VAR_RANGE
+    returning
+      value(RT_RANGE) type RSR_T_RANGESID
+    raising
+      CX_RS_ERROR .
+  methods CHECK_POSTINGDATE
+    importing
+      !I_T_VAR_RANGE type RRS0_T_VAR_RANGE
+    returning
+      value(RT_RANGE) type RSR_T_RANGESID
+    raising
+      CX_RS_ERROR .
+ENDCLASS.
+
+
+
+CLASS ZCL_RSROA_VARIABLES_EXIT IMPLEMENTATION.
+
+METHOD if_rsroa_variables_exit_badi~process.
+
+  TRY.
+  c_t_range =
+    COND #( WHEN NOT c_t_range[] IS INITIAL
+            THEN c_t_range
+            WHEN i_step = 1
+            THEN COND #( WHEN i_vnam = 'POSTINGDATE' 
+                         THEN get_postingdate( ) )   
+            WHEN i_step = 3
+            THEN check( i_t_var_range ) ).  
+  CATCH cx_rs_error.
+    RAISE EXCEPTION TYPE cx_rs_error.
+  ENDTRY.
+
+ENDMETHOD.
+
+
+METHOD get_postingdate.
+
+  rt_range = VALUE #( ( sign = 'I'
+                        opt  = 'BT'
+                        low  = cl_hrpad_date_computations=>add_months_to_date(
+                                 start_date = sy-datum
+                                 months     = -12 )
+                        high = sy-datum ) ).
+
+ENDMETHOD.
+
+METHOD check.
+
+  TRY.
+    IF line_exists( i_t_var_range[ vnam = 'POSTINGDATE' ] ).           
+      check_postingdate( i_t_var_range ).
+    ENDIF.
+  CATCH cx_rs_error.
+    RAISE EXCEPTION TYPE cx_rs_error.
+  ENDTRY.
+  rt_range = VALUE #( ).
+
+ENDMETHOD.
+
+
+METHOD check_postingdate.
+  TRY.
+    DATA(w_date_from) = CONV d( i_t_var_range[ vnam = 'POSTINGDATE' ]-low ).
+    DATA(w_date_to) = CONV d( i_t_var_range[ vnam = 'POSTINGDATE' ]-high ).
+    IF w_date_to - w_date_from > 366.  
+      CALL FUNCTION 'RRMS_MESSAGE_HANDLING'
+           EXPORTING
+                i_class  = 'OO'
+                i_type   = 'E'
+                i_number = '000'
+                i_msgv1  = 'Posting Date range is more then 366 days'.  
+      RAISE EXCEPTION TYPE cx_rs_error.
+    ENDIF.
+  CATCH cx_sy_itab_line_not_found.
+  ENDTRY.
+
+ENDMETHOD.
+
+ENDCLASS.
