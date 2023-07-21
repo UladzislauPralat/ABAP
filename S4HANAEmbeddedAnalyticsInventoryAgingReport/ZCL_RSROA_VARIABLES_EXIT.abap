@@ -209,12 +209,12 @@ METHOD if_rsroa_variables_exit_badi~process.
             WHEN i_step = 1
             THEN COND #( WHEN i_vnam = 'INVAGINGDATE'
                          THEN get_invagingdate( )
-                         WHEN matches( val = i_vnam regex = '^INVAGINGRANGE[0-6]$' )
+                         WHEN matches( val = i_vnam regex = '^INVAGINGRANGE[1-4]$' )
                          THEN get_invagingrange( i_vnam = i_vnam )
                          WHEN i_vnam = 'INVAGINGINTFLOWELIM'
                          THEN get_invagingintflowelim( ) )
             WHEN i_step = 2
-            THEN COND #( WHEN matches( val = i_vnam regex = '^INVAGINGRANGETEXT[0-5]$' )
+            THEN COND #( WHEN matches( val = i_vnam regex = '^INVAGINGRANGETEXT[1-5]$' )
                          THEN get_invagingrangetext( i_vnam        = i_vnam
                                                      i_t_var_range = i_t_var_range ) )
             WHEN i_step = 3
