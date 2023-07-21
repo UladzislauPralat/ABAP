@@ -18,7 +18,7 @@ private section.
       !I_VNAM type RSZGLOBV-VNAM
     returning
       value(RT_RANGE) type RSR_T_RANGESID .
-  methods GET_INTFLOWELIM
+  methods GET_INVAGINGINTFLOWELIM
     returning
       value(RT_RANGE) type RSR_T_RANGESID .
   methods GET_INVAGINGRANGETEXT
@@ -138,7 +138,7 @@ DATA: w_msgv1 TYPE string.
 ENDMETHOD.
 
 
-METHOD get_intflowelim.
+METHOD get_invagingintflowelim.
 
   rt_range = VALUE #( ( sign = 'I'
                         opt  = 'EQ'
@@ -212,7 +212,7 @@ METHOD if_rsroa_variables_exit_badi~process.
                          WHEN matches( val = i_vnam regex = '^INVAGINGRANGE[0-6]$' )
                          THEN get_invagingrange( i_vnam = i_vnam )
                          WHEN i_vnam = 'INVAGINGINTFLOWELIM'
-                         THEN get_intflowelim( ) )
+                         THEN get_invagingintflowelim( ) )
             WHEN i_step = 2
             THEN COND #( WHEN matches( val = i_vnam regex = '^INVAGINGRANGETEXT[0-5]$' )
                          THEN get_invagingrangetext( i_vnam        = i_vnam
