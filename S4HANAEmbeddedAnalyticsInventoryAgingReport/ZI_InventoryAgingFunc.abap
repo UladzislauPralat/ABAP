@@ -20,6 +20,10 @@ returns
   key lgort: lgort_d;
   key sobkz: sobkz;
   key kunnr_sid: nsdm_kunnr;
+  key lifnr: elifn;
+  key kzbws: kzbws;
+  key mat_kdauf: mat_kdauf;
+  key mat_kdpos: mat_kdpos;  
   key matnr: matnr;
   key lbbsa_sid: nsdm_lbbsa; 
   aging_range: abap.char(1);
@@ -27,7 +31,7 @@ returns
   meins: meins;
   waers: waers;  
   labst: labst;
-  salk3: salk3;    
+  salk3: salk3;   
 }
 implemented by method
   zcl_inventory_aging=>function;
