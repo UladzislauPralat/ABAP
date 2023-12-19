@@ -591,21 +591,29 @@ CLASS zcl_inventory_aging IMPLEMENTATION.
 /*  Inventory */
     inventory_flow =
       SELECT matdoc.mandt,
-             inventory_flow.werks, inventory_flow.lgort, inventory_flow.sobkz, inventory_flow.kunnr_sid,
+             inventory_flow.werks, inventory_flow.lgort, inventory_flow.sobkz, inventory_flow.kunnr_sid, inventory_flow.lifnr, inventory_flow.kzbws, inventory_flow.mat_kdauf, inventory_flow.mat_kdpos,
              matdoc.matnr, matdoc.lbbsa_sid, matdoc.budat, matdoc.shkzg, matdoc.meins, matdoc.menge
       FROM ( SELECT mandt, mblnr, mjahr,
              werks,
              CAST(CASE WHEN P_Internal_Flow_Elimination = 'Y' THEN '' ELSE lgort END AS NVARCHAR( 4 )) AS lgort,
-             CAST(CASE WHEN P_Internal_Flow_Elimination = 'Y' THEN '' ELSE sobkz END AS NVARCHAR( 1 )) AS sobkz,
-             CAST(CASE WHEN P_Internal_Flow_Elimination = 'Y' THEN '' ELSE kunnr_sid END AS NVARCHAR( 10 )) AS kunnr_sid,
+             sobkz,
+             CAST(CASE WHEN sobkz = 'W' THEN kunnr_sid ELSE '' END AS NVARCHAR( 10 )) AS kunnr_sid,
+             CAST(CASE WHEN sobkz IN ( 'O', 'K' ) THEN lifnr     ELSE '' END AS NVARCHAR( 10 )) AS lifnr,
+             CAST(CASE WHEN sobkz IN ( 'E', 'T' ) THEN kzbws     ELSE '' END AS NVARCHAR( 1 )) AS kzbws,
+             CAST(CASE WHEN sobkz IN ( 'E', 'T' ) THEN mat_kdauf ELSE '' END AS NVARCHAR( 10 )) AS mat_kdauf,
+             CAST(CASE WHEN sobkz IN ( 'E', 'T' ) THEN mat_kdpos ELSE '' END AS NVARCHAR( 6 )) AS mat_kdpos,
              matnr, lbbsa_sid, SUM( CASE WHEN shkzg = 'S' THEN menge WHEN shkzg = 'H' THEN menge * -1 END ) AS menge
              FROM matdoc
              WHERE budat <= P_Current_Date
              GROUP BY mandt, mblnr, mjahr,
                       werks,
                       CAST(CASE WHEN P_Internal_Flow_Elimination = 'Y' THEN '' ELSE lgort END AS NVARCHAR( 4 )),
-                      CAST(CASE WHEN P_Internal_Flow_Elimination = 'Y' THEN '' ELSE sobkz END AS NVARCHAR( 1 )),
-                      CAST(CASE WHEN P_Internal_Flow_Elimination = 'Y' THEN '' ELSE kunnr_sid END AS NVARCHAR( 10 )),
+                      sobkz,
+                      CAST(CASE WHEN sobkz = 'W'           THEN kunnr_sid ELSE '' END AS NVARCHAR( 10 )),
+                      CAST(CASE WHEN sobkz IN ( 'O', 'K' ) THEN lifnr     ELSE '' END AS NVARCHAR( 10 )),
+                      CAST(CASE WHEN sobkz IN ( 'E', 'T' ) THEN kzbws     ELSE '' END AS NVARCHAR( 1 )),
+                      CAST(CASE WHEN sobkz IN ( 'E', 'T' ) THEN mat_kdauf ELSE '' END AS NVARCHAR( 10 )),
+                      CAST(CASE WHEN sobkz IN ( 'E', 'T' ) THEN mat_kdpos ELSE '' END AS NVARCHAR( 6 )),
                       matnr, lbbsa_sid
              HAVING SUM( CASE WHEN shkzg = 'S' THEN menge WHEN shkzg = 'H' THEN menge * -1 END ) <> 0  ) AS inventory_flow
              INNER JOIN matdoc
@@ -614,43 +622,47 @@ CLASS zcl_inventory_aging IMPLEMENTATION.
                     AND inventory_flow.mjahr = matdoc.mjahr
                     AND inventory_flow.werks = matdoc.werks
                     AND inventory_flow.lgort = CAST(CASE WHEN P_Internal_Flow_Elimination = 'Y' THEN '' ELSE matdoc.lgort END AS NVARCHAR( 4 ))
-                    AND inventory_flow.sobkz = CAST(CASE WHEN P_Internal_Flow_Elimination = 'Y' THEN '' ELSE matdoc.sobkz END AS NVARCHAR( 1 ))
-                    AND inventory_flow.kunnr_sid = CAST(CASE WHEN P_Internal_Flow_Elimination = 'Y' THEN '' ELSE matdoc.kunnr_sid END AS NVARCHAR( 10 ))
+                    AND inventory_flow.sobkz = matdoc.sobkz
+                    AND inventory_flow.kunnr_sid = CAST(CASE WHEN matdoc.sobkz = 'W' THEN matdoc.kunnr_sid ELSE '' END AS NVARCHAR( 10 ))
+                    AND inventory_flow.lifnr     = CAST(CASE WHEN matdoc.sobkz IN ( 'O', 'K' ) THEN matdoc.lifnr     ELSE '' END AS NVARCHAR( 10 ))
+                    AND inventory_flow.kzbws     = CAST(CASE WHEN matdoc.sobkz IN ( 'E', 'T' ) THEN matdoc.kzbws     ELSE '' END AS NVARCHAR( 1 ))
+                    AND inventory_flow.mat_kdauf = CAST(CASE WHEN matdoc.sobkz IN ( 'E', 'T' ) THEN matdoc.mat_kdauf ELSE '' END AS NVARCHAR( 10 ))
+                    AND inventory_flow.mat_kdpos = CAST(CASE WHEN matdoc.sobkz IN ( 'E', 'T' ) THEN matdoc.mat_kdpos ELSE '' END AS NVARCHAR( 6 ))
                     AND inventory_flow.matnr = matdoc.matnr
                     AND inventory_flow.lbbsa_sid = matdoc.lbbsa_sid;
 
     inventory_inflow =
       SELECT mandt, werks,
-             lgort, sobkz, kunnr_sid,
+             lgort, sobkz, kunnr_sid, lifnr, kzbws, mat_kdauf, mat_kdpos,
              matnr, lbbsa_sid, budat, meins,
              menge AS menge_inflow,
              SUM( menge ) OVER ( PARTITION BY mandt, werks,
-                                              lgort, sobkz, kunnr_sid,
+                                              lgort, sobkz, kunnr_sid, lifnr, kzbws, mat_kdauf, mat_kdpos,
                                               matnr, lbbsa_sid ORDER BY budat ASC) AS menge_inflow_rt
       FROM (
              SELECT mandt, werks,
-                    lgort, sobkz, kunnr_sid,
+                    lgort, sobkz, kunnr_sid, lifnr, kzbws, mat_kdauf, mat_kdpos,
                     matnr, lbbsa_sid, budat, meins, SUM( menge ) AS menge
              FROM :inventory_flow
              WHERE shkzg = 'S'
              GROUP BY mandt, werks,
-                      lgort, sobkz, kunnr_sid,
+                      lgort, sobkz, kunnr_sid, lifnr, kzbws, mat_kdauf, mat_kdpos,
                       matnr, lbbsa_sid, budat, meins
            );
 
     inventory_outflow =
        SELECT mandt, werks,
-              lgort, sobkz, kunnr_sid,
+              lgort, sobkz, kunnr_sid, lifnr, kzbws, mat_kdauf, mat_kdpos,
               matnr, lbbsa_sid, MAX(budat) AS budat_h_max, SUM( menge ) AS menge_outflow_t
        FROM :inventory_flow
        WHERE shkzg = 'H'
        GROUP BY mandt, werks,
-                lgort, sobkz, kunnr_sid,
+                lgort, sobkz, kunnr_sid, lifnr, kzbws, mat_kdauf, mat_kdpos,
                 matnr, lbbsa_sid;
 
     inventory =
       SELECT inflow.mandt, inflow.werks,
-             inflow.lgort, inflow.sobkz, inflow.kunnr_sid,
+             inflow.lgort, inflow.sobkz, inflow.kunnr_sid, inflow.lifnr, inflow.kzbws, inflow.mat_kdauf, inflow.mat_kdpos,
              inflow.matnr, inflow.lbbsa_sid, inflow.budat, inflow.meins,
              DAYS_BETWEEN(inflow.budat, P_Current_Date ) AS aging,
              outflow.budat_h_max,
@@ -668,6 +680,10 @@ CLASS zcl_inventory_aging IMPLEMENTATION.
                                                    AND inflow.lgort     = outflow.lgort
                                                    AND inflow.sobkz     = outflow.sobkz
                                                    AND inflow.kunnr_sid = outflow.kunnr_sid
+                                                   AND inflow.lifnr     = outflow.lifnr
+                                                   AND inflow.kzbws     = outflow.kzbws
+                                                   AND inflow.mat_kdauf = outflow.mat_kdauf
+                                                   AND inflow.mat_kdpos = outflow.mat_kdpos
                                                    AND inflow.matnr     = outflow.matnr
                                                    AND inflow.lbbsa_sid = outflow.lbbsa_sid
       WHERE inflow.menge_inflow_rt > outflow.menge_outflow_t
@@ -675,14 +691,16 @@ CLASS zcl_inventory_aging IMPLEMENTATION.
 
     RETURN
       SELECT inventory.mandt, inventory.werks,
-             inventory.lgort, inventory.sobkz, inventory.kunnr_sid,
+             inventory.lgort, inventory.sobkz, inventory.kunnr_sid, inventory.lifnr, inventory.kzbws, inventory.mat_kdauf, inventory.mat_kdpos,
              inventory.matnr, inventory.lbbsa_sid, inventory.aging_range, inventory.budat_h_max, inventory.meins, t001.waers, inventory.menge AS labst,
              CASE WHEN inventory.menge = 0 THEN 0 ELSE ( mbew.salk3 / mbew.lbkum ) * inventory.menge END AS salk3
       FROM ( SELECT inventory.mandt, inventory.werks,
-             inventory.lgort, inventory.sobkz, inventory.kunnr_sid, inventory.lbbsa_sid, inventory.matnr, inventory.aging_range, inventory.budat_h_max, inventory.meins, SUM( menge ) AS menge
+             inventory.lgort, inventory.sobkz, inventory.kunnr_sid, inventory.lifnr, inventory.kzbws, inventory.mat_kdauf, inventory.mat_kdpos, inventory.lbbsa_sid,
+             inventory.matnr, inventory.aging_range, inventory.budat_h_max, inventory.meins, SUM( menge ) AS menge
              FROM :inventory AS inventory
              GROUP BY inventory.mandt, inventory.werks,
-                      inventory.lgort, inventory.sobkz, inventory.kunnr_sid, inventory.lbbsa_sid, inventory.matnr, inventory.meins, inventory.aging_range, inventory.budat_h_max ) inventory
+                      inventory.lgort, inventory.sobkz, inventory.kunnr_sid, inventory.lifnr, inventory.kzbws, inventory.mat_kdauf, inventory.mat_kdpos, inventory.lbbsa_sid,
+                      inventory.matnr, inventory.meins, inventory.aging_range, inventory.budat_h_max ) inventory
              LEFT OUTER JOIN :mbv_mbew mbew
                           ON inventory.mandt = mbew.mandt
                          AND inventory.werks = mbew.bwkey
