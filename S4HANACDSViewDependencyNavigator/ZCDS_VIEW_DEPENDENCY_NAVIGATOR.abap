@@ -10,12 +10,10 @@ SELECTION-SCREEN BEGIN OF BLOCK cds WITH FRAME TITLE c_cds.
   SELECTION-SCREEN END OF LINE.
 SELECTION-SCREEN END OF BLOCK cds.
 
-
 SELECTION-SCREEN BEGIN OF BLOCK direction WITH FRAME TITLE c_dir.
   SELECTION-SCREEN BEGIN OF LINE.
     SELECTION-SCREEN COMMENT 1(31) c_up FOR FIELD p_up.
-    PARAMETERS: p_up RADIOBUTTON GROUP dir DEFAULT 'X'
-                     USER-COMMAND sel_staging_type.
+    PARAMETERS: p_up RADIOBUTTON GROUP dir DEFAULT 'X'.
   SELECTION-SCREEN END OF LINE.
   SELECTION-SCREEN BEGIN OF LINE.
     SELECTION-SCREEN COMMENT 1(31) c_down FOR FIELD p_down.
@@ -640,7 +638,7 @@ START-OF-SELECTION.
 FORM display_alv.
 
   DATA(wt_fieldcat) = lcl_application=>get_fieldcat( ).
-  DATA(wa_layout) = VALUE slis_layout_alv( colwidth_optimize = 'X' ).
+  DATA(wa_layout) = VALUE slis_layout_alv( colwidth_optimize = abap_true ).
   DATA(wt_dependency) = application->get_dependency( ).
 
   CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
@@ -649,6 +647,7 @@ FORM display_alv.
             i_callback_user_command = 'USER_COMMAND'
             it_fieldcat             = wt_fieldcat[]
             is_layout               = wa_layout
+            i_save                  = 'A'
        TABLES
             t_outtab                = wt_dependency
        EXCEPTIONS
