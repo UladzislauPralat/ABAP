@@ -301,7 +301,7 @@ CLASS lcl_application IMPLEMENTATION.
 
     REPLACE ALL OCCURRENCES OF PCRE '(--|//).*\R' IN w_ddlsource WITH ''.
 *
-    FIND PCRE 'define\s+view(?:\s+entity)?\s+([A-Za-z][A-Za-z0-9_]*)'
+    FIND PCRE 'define(?:\s+transient)?\s+view(?:\s+entity)?\s+([A-Za-z][A-Za-z0-9_]*)'
       IN w_ddlsource
       IGNORING CASE
       SUBMATCHES c_dependency-ddlname.
@@ -418,7 +418,7 @@ CLASS lcl_application IMPLEMENTATION.
       REPLACE ALL OCCURRENCES OF PCRE '(--|//).*\R' IN <dependency>-ddlsource WITH ''.
       REPLACE ALL OCCURRENCES OF PCRE '/\*\+\[internal][\s\S]*?\*/' IN <dependency>-ddlsource WITH ''.
       REPLACE ALL OCCURRENCES OF PCRE '/\*+[\s\S]*?[\s\S]*?\*/' IN <dependency>-ddlsource WITH ''.
-      FIND PCRE |(?:from\|join)\\s+({ i_name })(?:\\s\|\\()|
+      FIND PCRE |(?:from\|join\|projection\\s+on)\\s+({ i_name })(?:\\s\|\\()|
         IN <dependency>-ddlsource
         IGNORING CASE.
       IF sy-subrc <> 0.
@@ -456,7 +456,7 @@ CLASS lcl_application IMPLEMENTATION.
     IF sy-subrc = 0.
       REPLACE ALL OCCURRENCES OF PCRE '(--|//).*\R' IN w_source WITH ''.
       REPLACE ALL OCCURRENCES OF PCRE '/\*+[\s\S]*?[\s\S]*?\*/' IN w_source WITH ''.
-      FIND ALL OCCURRENCES OF PCRE '(?:from|join)\s+([a-z0-9_/]+)' IN w_source
+      FIND ALL OCCURRENCES OF PCRE '(?:from|join|projection\s+on)\s+([a-z0-9_/]+)' IN w_source
       IGNORING CASE
       RESULTS DATA(wt_match_result).
       rt_dependency =
