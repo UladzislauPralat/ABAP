@@ -449,9 +449,11 @@ CLASS lcl_application IMPLEMENTATION.
       RAISE EXCEPTION TYPE lcx_exception EXPORTING text = 'No more dependencies'.
     ENDIF.
 
-    SELECT SINGLE source
-    FROM ddddlsrc
-    WHERE ddlname = upper( @i_name )
+    SELECT SINGLE ddddlsrc~source
+    FROM ddddlsrc INNER JOIN ddldependency
+                          ON ddddlsrc~ddlname = ddldependency~ddlname
+                         AND objecttype = 'STOB'
+    WHERE ddldependency~objectname = upper( @i_name )
     INTO @DATA(w_source).
     IF sy-subrc = 0.
       REPLACE ALL OCCURRENCES OF PCRE '(--|//).*\R' IN w_source WITH ''.
@@ -473,7 +475,10 @@ CLASS lcl_application IMPLEMENTATION.
         SELECT SINGLE ddddlsrc~source,
                       ddddlsrct~ddtext AS ddltext,
                       dd07t~ddtext AS ddltype
-        FROM ddddlsrc LEFT OUTER JOIN ddddlsrct
+        FROM ddddlsrc INNER JOIN ddldependency
+                          ON ddddlsrc~ddlname = ddldependency~ddlname
+                         AND objecttype = 'STOB'
+                      LEFT OUTER JOIN ddddlsrct
                                    ON ddddlsrc~ddlname      = ddddlsrct~ddlname
                                   AND ddddlsrct~ddlanguage = 'E'
                                   AND ddddlsrct~as4local   = 'A'
@@ -483,7 +488,7 @@ CLASS lcl_application IMPLEMENTATION.
                                   AND dd07t~ddlanguage = 'E'
                                   AND dd07t~as4local = 'A'
                                   AND dd07t~as4vers = '000'
-        WHERE ddddlsrc~ddlname = upper( @<dependency>-ddlname )
+        WHERE ddldependency~objectname = upper( @<dependency>-ddlname )
         INTO ( @<dependency>-ddlsource, @<dependency>-ddltext, @<dependency>-ddltype ).
         CASE sy-subrc.
           WHEN 0.
@@ -525,9 +530,16 @@ CLASS lcl_application IMPLEMENTATION.
         WHERE ddlname = upper( @i_name )
         INTO @DATA(w_cds_view_exists).
         IF sy-subrc <> 0.
-          RAISE EXCEPTION TYPE lcx_exception
-            EXPORTING
-              text = |{ i_name } is not a valid table or CDS view name|.
+          SELECT SINGLE 'X'
+          FROM ddldependency
+          WHERE objectname = upper( @i_name )
+            AND objecttype = 'STOB'
+          INTO @w_cds_view_exists.
+          IF sy-subrc <> 0.
+            RAISE EXCEPTION TYPE lcx_exception
+              EXPORTING
+                text = |{ i_name } is not a valid table or CDS view name|.
+          ENDIF.
         ENDIF.
       ENDIF.
     ENDIF.
